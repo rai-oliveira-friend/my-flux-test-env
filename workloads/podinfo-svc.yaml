@@ -11,6 +11,6 @@ spec:
     app: podinfo
   ports:
   - name: http
-    port: 9899
+    port: 9898
     protocol: TCP
     targetPort: http
