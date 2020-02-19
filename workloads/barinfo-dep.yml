@@ -33,7 +33,7 @@ spec:
         - "1"
       containers:
       - name: barinfod
-        image: stefanprodan/podinfo:3.2.0
+        image: stefanprodan/podinfo:3.1.0
         imagePullPolicy: IfNotPresent
         ports:
         - name: http
