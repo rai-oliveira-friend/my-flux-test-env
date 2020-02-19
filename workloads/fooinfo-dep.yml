@@ -1,0 +1,75 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fooinfo
+  namespace: flux
+  labels:
+    app: podinfo
+  annotations:
+    fluxcd.io/automated: "true"
+    fluxcd.io/tag.init: regex:^3.10.*
+    fluxcd.io/tag.podinfod: semver:~3.1
+spec:
+  strategy:
+    rollingUpdate:
+      maxUnavailable: 0
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: fooinfo
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9797"
+      labels:
+        app: fooinfo
+    spec:
+      initContainers:
+      - name: init
+        image: alpine:3.10
+        command:
+        - sleep
+        - "1"
+      containers:
+      - name: fooinfod
+        image: stefanprodan/podinfo:3.1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: http
+          containerPort: 9880
+          protocol: TCP
+        - name: http-metrics
+          containerPort: 9780
+          protocol: TCP
+        - name: grpc
+          containerPort: 9980
+          protocol: TCP
+        command:
+        - ./podinfo
+        - --port=9880
+        - --port-metrics=9780
+        - --grpc-port=9980
+        - --grpc-service-name=fooinfo
+        - --level=info
+        - --random-delay=false
+        - --random-error=false
+        env:
+        - name: PODINFO_UI_COLOR
+          value: "#34577c"
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 9880
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 9880
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
