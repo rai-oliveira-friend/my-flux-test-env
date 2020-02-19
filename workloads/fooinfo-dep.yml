@@ -7,7 +7,6 @@ metadata:
   labels:
     app: podinfo
   annotations:
-    fluxcd.io/automated: "true"
     fluxcd.io/tag.init: regex:^3.10.*
     fluxcd.io/tag.podinfod: semver:~3.1
 spec:
